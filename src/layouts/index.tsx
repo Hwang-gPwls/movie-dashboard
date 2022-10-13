@@ -11,7 +11,7 @@ const DefaultLayout = ({ children }: LayoutDefaultProps) => {
   return (
     <div>
       <Menu />
-      <Header />
+      {/* <Header /> */}
       <main>{children || <Outlet />}</main>
     </div>
   );
