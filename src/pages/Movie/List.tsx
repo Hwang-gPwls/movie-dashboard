@@ -1,75 +1,61 @@
-import { Pagination } from "@mui/material";
 import Paper from "@mui/material/Paper";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useQuery } from "react-query";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
 
-import fetchMoviesWithQuery, { PaginationResponse } from "../../api/movie";
+import { PaginationResponse, fetchMoviesWithQuery } from "../../api/movie";
+import MovieModal from "../../components/MovieModal";
+import MovieTable, { Column } from "../../components/MovieTable";
+import Paging from "../../components/Paging";
+import {
+  modalPropsState,
+  paginationState,
+  selectedMovieState,
+} from "../../recoils/movie/atom";
 
-interface IMovie {
-  id: string;
-  backdrop_path: string;
-  title: string;
-  vote_average: number;
-  vote_count: number;
-  release_date: string;
-  overview: string;
-}
-
-interface Column {
-  id:
-    | "title"
-    | "backdrop_path"
-    | "vote_average"
-    | "vote_count"
-    | "release_date";
-  label: string;
-  minWidth?: number;
-  align?: "center";
-  format?: (value: number) => string;
-}
-
-const columns: readonly Column[] = [
+const columns: Column[] = [
   {
     id: "title",
     label: "Title",
     minWidth: 170,
+    display: "table-cell",
     align: "center",
-    format: (value: number) => value.toLocaleString("en-US"),
   },
   {
     id: "backdrop_path",
     label: "Image",
     minWidth: 170,
+    display: "table-cell",
     align: "center",
-    format: (value: number) => value.toLocaleString("en-US"),
   },
   {
     id: "vote_average",
     label: "Vote Average",
     minWidth: 170,
+    display: "table-cell",
     align: "center",
-    format: (value: number) => value.toLocaleString("en-US"),
   },
   {
     id: "vote_count",
     label: "Vote count",
     minWidth: 170,
+    display: "table-cell",
     align: "center",
-    format: (value: number) => value.toFixed(2),
   },
   {
     id: "release_date",
     label: "Release Date",
     minWidth: 170,
+    display: "table-cell",
     align: "center",
-    format: (value: number) => value.toFixed(2),
+  },
+  {
+    id: "overview",
+    label: "Overview",
+    minWidth: 170,
+    display: "none",
+    align: "center",
   },
 ];
 
@@ -80,76 +66,45 @@ const Container = styled(Paper)`
 `;
 
 const List = () => {
-  const [page, setPage] = useState(1);
+  const page = useRecoilValue(paginationState);
+  const selectedMovie = useRecoilValue(selectedMovieState);
+  const handleModalProps = useSetRecoilState(modalPropsState);
 
   const { data, isFetching } = useQuery<PaginationResponse, boolean>(
     ["movies", page],
     () => fetchMoviesWithQuery(page),
     {
       keepPreviousData: true,
-      refetchOnWindowFocus: true,
       staleTime: 60000,
     },
   );
 
   const movies = useMemo(() => (data ? data.results : []), [data]);
 
-  const onPageChange = (e: React.ChangeEvent<unknown>) => {
-    const button = e.target as HTMLElement;
-    setPage(Number(button.innerText));
+  const calcPageRange = (totalPage: number) => {
+    return Math.ceil(totalPage / 20) > 5 ? 5 : Math.ceil(totalPage / 20);
   };
 
-  console.log(data);
+  useEffect(() => {
+    if (selectedMovie.id === -1) {
+      return;
+    }
+
+    handleModalProps({
+      isOpen: true,
+      modalType: "List",
+    });
+  }, [selectedMovie]);
 
   return (
     <Container>
-      <TableContainer sx={{ maxHeight: 440 }}>
-        <Table stickyHeader aria-label="sticky table">
-          <TableHead>
-            <TableRow>
-              {columns.map(column => (
-                <TableCell
-                  key={column.id}
-                  align={column.align}
-                  style={{ minWidth: column.minWidth }}
-                >
-                  {column.label}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {movies.map((movie: IMovie) => {
-              return (
-                <TableRow hover role="checkbox" tabIndex={-1} key={movie.id}>
-                  {columns.map(column => {
-                    return (
-                      <TableCell key={column.id} align={column.align}>
-                        {column.id === "backdrop_path" ? (
-                          <img
-                            src={`https://image.tmdb.org/t/p/w342${
-                              movie[column.id]
-                            }`}
-                            alt="poster"
-                          />
-                        ) : (
-                          movie[column.id]
-                        )}
-                      </TableCell>
-                    );
-                  })}
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <Pagination
-        count={data ? data.total_pages : 0}
-        variant="outlined"
-        shape="rounded"
-        onChange={onPageChange}
+      <MovieTable columns={columns} movies={movies} />
+      <Paging
+        itemsCountPerPage={20}
+        totalItemsCount={data ? data.total_results : 0}
+        pageRangeDisplayed={data ? calcPageRange(data.total_results) : 0}
       />
+      <MovieModal />
     </Container>
   );
 };

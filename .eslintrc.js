@@ -9,7 +9,13 @@ module.exports = {
       tsx: true,
     },
   },
-  rules: {},
+  rules: {
+    eqeqeq: "off",
+    curly: "error",
+    quotes: ["error", "double"],
+    "no-mixed-spaces-and-tabs": "error",
+    "no-multiple-empty-lines": "error",
+  },
   settings: {
     react: {
       version: "detect",

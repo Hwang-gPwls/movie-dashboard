@@ -1,7 +1,9 @@
 import { NavLink } from "react-router-dom";
+import { useResetRecoilState } from "recoil";
 import styled from "styled-components";
 
 import { menuItems } from "../public/data";
+import { selectedMovieState } from "../recoils/movie/atom";
 
 const Nav = styled.nav`
   display: flex;
@@ -45,13 +47,15 @@ const Item = styled(NavLink)`
 `;
 
 const Menu = () => {
+  const resetList = useResetRecoilState(selectedMovieState);
+
   return (
     <Nav>
       <Col>
         <Logo />
         <Items>
           {menuItems.map(item => (
-            <Item key={item.key} to={item.path}>
+            <Item key={item.key} to={item.path} onClick={resetList}>
               {item.name}
             </Item>
           ))}

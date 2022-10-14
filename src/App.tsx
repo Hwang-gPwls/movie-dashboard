@@ -1,4 +1,3 @@
-import { StyledEngineProvider } from "@mui/styled-engine";
 import React, { Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { BrowserRouter as Router, useRoutes } from "react-router-dom";
@@ -17,7 +16,7 @@ const queryClient = new QueryClient();
 
 function App() {
   return (
-    <StyledEngineProvider injectFirst>
+    <>
       <GlobalStyle />
       <ThemeProvider theme={theme}>
         <QueryClientProvider client={queryClient}>
@@ -30,7 +29,7 @@ function App() {
           </RecoilRoot>
         </QueryClientProvider>
       </ThemeProvider>
-    </StyledEngineProvider>
+    </>
   );
 }
 
