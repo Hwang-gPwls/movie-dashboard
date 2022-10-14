@@ -10,3 +10,18 @@ export const menuItems = [
     path: "/search",
   },
 ];
+
+export const selectItems = [
+  {
+    key: "movie",
+    name: "Movie",
+  },
+  {
+    key: "people",
+    name: "People",
+  },
+  {
+    key: "TV",
+    name: "TV Show",
+  },
+];

@@ -1,10 +1,16 @@
+import { useEffect } from "react";
 import Pagination from "react-js-pagination";
-import { useRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
 
-import { paginationState } from "../recoils/movie/atom";
+import { searchKeywordState } from "../recoils/movie/atom";
+import {
+  filteredPaginationState,
+  paginationState,
+} from "../recoils/movie/atom";
 
 interface IPagingProps {
+  pageName: "List" | "Search";
   itemsCountPerPage: number;
   totalItemsCount: number;
   pageRangeDisplayed: number;
@@ -54,20 +60,37 @@ const PaginationBox = styled.div`
 `;
 
 const Paging = ({
+  pageName,
   itemsCountPerPage,
   totalItemsCount,
   pageRangeDisplayed,
 }: IPagingProps) => {
-  const [page, setPage] = useRecoilState(paginationState);
+  const keyword = useRecoilValue(searchKeywordState);
+  const pageValue = useRecoilValue(filteredPaginationState(pageName));
+  const handelPageValue = useSetRecoilState(paginationState);
 
   const onPageChange = (pageNumber: number) => {
-    setPage(pageNumber);
+    handelPageValue(allPageValue => {
+      const pageValuesCopy = [...allPageValue];
+      const idxTaskObj = pageValuesCopy.indexOf(pageValue[0]);
+
+      pageValuesCopy.splice(idxTaskObj, 1, {
+        pageName: pageName,
+        page: pageNumber,
+      });
+
+      return pageValuesCopy;
+    });
   };
+
+  useEffect(() => {
+    onPageChange(1);
+  }, [keyword]);
 
   return (
     <PaginationBox>
       <Pagination
-        activePage={page}
+        activePage={pageValue[0].page}
         itemsCountPerPage={itemsCountPerPage}
         totalItemsCount={totalItemsCount}
         pageRangeDisplayed={pageRangeDisplayed}

@@ -1,18 +1,37 @@
-import { atom } from "recoil";
+import { atom, selector, selectorFamily } from "recoil";
 
 import { IMovie } from "../../api/movie";
 
-export const paginationState = atom<number>({
+export interface IPaginationProps {
+  pageName: "List" | "Search";
+  page: number;
+}
+
+export const paginationState = atom<IPaginationProps[]>({
   key: "paginationState",
-  default: 1,
+  default: [
+    { pageName: "List", page: 1 },
+    { pageName: "Search", page: 1 },
+  ],
 });
 
-export interface ModalProps {
+export const filteredPaginationState = selectorFamily<
+  IPaginationProps[],
+  string
+>({
+  key: "filteredPaginationState",
+  get:
+    (param: string) =>
+    ({ get }) =>
+      get(paginationState).filter(page => page.pageName === `${param}`),
+});
+
+export interface IModalProps {
   modalType: "List" | "Search";
   isOpen: boolean;
 }
 
-export const modalPropsState = atom<ModalProps>({
+export const modalPropsState = atom<IModalProps>({
   key: "modalOpenState",
   default: {
     modalType: "List",
@@ -31,4 +50,14 @@ export const selectedMovieState = atom<IMovie>({
     release_date: "",
     overview: "",
   },
+});
+
+export const searchKeywordState = atom<string>({
+  key: "searchKeywordState",
+  default: ".",
+});
+
+export const selectedValueState = atom<string>({
+  key: "selectedValueState",
+  default: "",
 });

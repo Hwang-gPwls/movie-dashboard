@@ -4,13 +4,14 @@ import { useQuery } from "react-query";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
 
-import { PaginationResponse, fetchMoviesWithQuery } from "../../api/movie";
+import { PaginationResponse, fetchMovies } from "../../api/movie";
 import MovieModal from "../../components/MovieModal";
 import MovieTable, { Column } from "../../components/MovieTable";
 import Paging from "../../components/Paging";
+import { useListMovieData } from "../../hooks/queries/movie";
 import {
+  filteredPaginationState,
   modalPropsState,
-  paginationState,
   selectedMovieState,
 } from "../../recoils/movie/atom";
 
@@ -66,18 +67,11 @@ const Container = styled(Paper)`
 `;
 
 const List = () => {
-  const page = useRecoilValue(paginationState);
+  const page = useRecoilValue(filteredPaginationState("List"));
   const selectedMovie = useRecoilValue(selectedMovieState);
   const handleModalProps = useSetRecoilState(modalPropsState);
 
-  const { data, isFetching } = useQuery<PaginationResponse, boolean>(
-    ["movies", page],
-    () => fetchMoviesWithQuery(page),
-    {
-      keepPreviousData: true,
-      staleTime: 60000,
-    },
-  );
+  const { data, isFetching } = useListMovieData(page[0].page);
 
   const movies = useMemo(() => (data ? data.results : []), [data]);
 
@@ -100,6 +94,7 @@ const List = () => {
     <Container>
       <MovieTable columns={columns} movies={movies} />
       <Paging
+        pageName={"List"}
         itemsCountPerPage={20}
         totalItemsCount={data ? data.total_results : 0}
         pageRangeDisplayed={data ? calcPageRange(data.total_results) : 0}

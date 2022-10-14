@@ -42,8 +42,12 @@ const MovieModal = () => {
               <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                 {movie.overview}
               </Typography>
-              <Button>수정</Button>
-              <Button>삭제</Button>
+              {modalProps.modalType === "List" ? (
+                <>
+                  <Button>수정</Button>
+                  <Button>삭제</Button>
+                </>
+              ) : null}
             </Box>
           </Modal>
         </div>
