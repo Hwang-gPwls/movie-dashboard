@@ -5,14 +5,14 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
 
 import { PaginationResponse, fetchMovies } from "../../api/movie";
-import MovieModal from "../../components/MovieModal";
-import MovieTable, { Column } from "../../components/MovieTable";
+import MovieModal from "../../components/Modal";
 import Paging from "../../components/Paging";
+import MovieTable, { Column } from "../../components/Table";
 import { useListMovieData } from "../../hooks/queries/movie";
 import {
   filteredPaginationState,
   modalPropsState,
-  selectedMovieState,
+  selectedMediaState,
 } from "../../recoils/movie/atom";
 
 const columns: Column[] = [
@@ -68,7 +68,7 @@ const Container = styled(Paper)`
 
 const List = () => {
   const page = useRecoilValue(filteredPaginationState("List"));
-  const selectedMovie = useRecoilValue(selectedMovieState);
+  const media = useRecoilValue(selectedMediaState);
   const handleModalProps = useSetRecoilState(modalPropsState);
 
   const { data, isFetching } = useListMovieData(page[0].page);
@@ -80,7 +80,7 @@ const List = () => {
   };
 
   useEffect(() => {
-    if (selectedMovie.id === -1) {
+    if (media.id === -1) {
       return;
     }
 
@@ -88,11 +88,11 @@ const List = () => {
       isOpen: true,
       modalType: "List",
     });
-  }, [selectedMovie]);
+  }, [media]);
 
   return (
     <Container>
-      <MovieTable columns={columns} movies={movies} />
+      <MovieTable columns={columns} datas={movies} />
       <Paging
         pageName={"List"}
         itemsCountPerPage={20}

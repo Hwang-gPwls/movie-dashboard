@@ -4,24 +4,21 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import { useRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 import styled from "styled-components";
 
-import { IMovie } from "../api/movie";
-import { selectedMovieState } from "../recoils/movie/atom";
-
-interface IMovieTableProps {
-  columns: Column[];
-  movies: IMovie[];
-}
+import { IMovie, ITVShow } from "../api/movie";
+import { selectedMediaState } from "../recoils/movie/atom";
 
 export interface Column {
   id:
     | "title"
+    | "name"
     | "backdrop_path"
     | "vote_average"
     | "vote_count"
     | "release_date"
+    | "first_air_date"
     | "overview";
   label: string;
   display: "table-cell" | "none";
@@ -33,24 +30,29 @@ const BodyRow = styled(TableRow)`
   cursor: pointer;
 `;
 
-const MovieTable = ({ columns, movies }: IMovieTableProps) => {
-  const [movieState, setMovieState] = useRecoilState(selectedMovieState);
+interface ITableControlProps {
+  columns: Column[];
+  datas: IMovie[] | ITVShow[];
+}
+
+const TableControl = ({ columns, datas }: ITableControlProps) => {
+  const setMedia = useSetRecoilState(selectedMediaState);
 
   const handleTableRowClick = (
     e: React.MouseEvent<HTMLElement>,
     id: number,
   ) => {
     const children = [].slice.call(e.currentTarget.children);
-    const copyMovieState = { ...movieState };
-
-    copyMovieState["id"] = id;
+    const copyMedia: IMovie | ITVShow = {} as IMovie | ITVShow;
 
     children.forEach((child: HTMLElement) => {
       const [key, value] = [child.id, child.innerText];
-      copyMovieState[key] = value;
+      copyMedia[key] = value;
     });
 
-    setMovieState(copyMovieState);
+    copyMedia["id"] = id;
+
+    setMedia(copyMedia);
   };
 
   return (
@@ -74,13 +76,14 @@ const MovieTable = ({ columns, movies }: IMovieTableProps) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {movies.map((movie: IMovie) => {
+            {datas.map(data => {
               return (
                 <BodyRow
                   hover
                   tabIndex={-1}
-                  key={movie.id}
-                  onClick={e => handleTableRowClick(e, movie.id)}
+                  key={data.id}
+                  id={data.id.toString()}
+                  onClick={e => handleTableRowClick(e, data.id)}
                 >
                   {columns.map(column => {
                     return (
@@ -95,12 +98,12 @@ const MovieTable = ({ columns, movies }: IMovieTableProps) => {
                         {column.id === "backdrop_path" ? (
                           <img
                             src={`https://image.tmdb.org/t/p/w342${
-                              movie[column.id]
+                              data[column.id]
                             }`}
                             alt="poster"
                           />
                         ) : (
-                          movie[column.id]
+                          data[column.id]
                         )}
                       </TableCell>
                     );
@@ -115,4 +118,4 @@ const MovieTable = ({ columns, movies }: IMovieTableProps) => {
   );
 };
 
-export default MovieTable;
+export default TableControl;

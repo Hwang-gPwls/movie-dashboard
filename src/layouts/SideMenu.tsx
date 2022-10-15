@@ -3,7 +3,7 @@ import { useResetRecoilState } from "recoil";
 import styled from "styled-components";
 
 import { menuItems } from "../public/data";
-import { selectedMovieState } from "../recoils/movie/atom";
+import { selectedMediaState } from "../recoils/movie/atom";
 
 const Nav = styled.nav`
   display: flex;
@@ -47,7 +47,7 @@ const Item = styled(NavLink)`
 `;
 
 const Menu = () => {
-  const resetList = useResetRecoilState(selectedMovieState);
+  const resetList = useResetRecoilState(selectedMediaState);
 
   return (
     <Nav>

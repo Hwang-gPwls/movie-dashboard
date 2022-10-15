@@ -1,72 +1,22 @@
 import Paper from "@mui/material/Paper";
-import { useEffect, useMemo } from "react";
-import { useQuery } from "react-query";
-import { useRecoilValue, useResetRecoilState, useSetRecoilState } from "recoil";
+import { useEffect, useMemo, useState } from "react";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
 
-import { PaginationResponse, fetchSearchMovies } from "../api/movie";
-import MovieModal from "../components/MovieModal";
-import MovieTable, { Column } from "../components/MovieTable";
+import Modal from "../components/Modal";
 import Paging from "../components/Paging";
+import PersonLayout from "../components/Person/PersonLatout";
 import SearchBar from "../components/SearchBar";
-import {
-  useSearchData,
-  useSearchMovieData,
-  useSearchPeopleData,
-  useSearchTVShowData,
-} from "../hooks/queries/movie";
+import Table from "../components/Table";
+import { useSearchData } from "../hooks/queries/movie";
+import { TVShowColumns, movieColumns } from "../public/data";
 import {
   filteredPaginationState,
   modalPropsState,
   searchKeywordState,
-  selectedMovieState,
+  selectedMediaState,
   selectedValueState,
 } from "../recoils/movie/atom";
-
-const columns: Column[] = [
-  {
-    id: "title",
-    label: "Title",
-    minWidth: 170,
-    display: "table-cell",
-    align: "center",
-  },
-  {
-    id: "backdrop_path",
-    label: "Image",
-    minWidth: 170,
-    display: "table-cell",
-    align: "center",
-  },
-  {
-    id: "vote_average",
-    label: "Vote Average",
-    minWidth: 170,
-    display: "table-cell",
-    align: "center",
-  },
-  {
-    id: "vote_count",
-    label: "Vote count",
-    minWidth: 170,
-    display: "table-cell",
-    align: "center",
-  },
-  {
-    id: "release_date",
-    label: "Release Date",
-    minWidth: 170,
-    display: "table-cell",
-    align: "center",
-  },
-  {
-    id: "overview",
-    label: "Overview",
-    minWidth: 170,
-    display: "none",
-    align: "center",
-  },
-];
 
 const Container = styled(Paper)`
   width: 90vw;
@@ -75,28 +25,27 @@ const Container = styled(Paper)`
 `;
 
 const Search = () => {
+  const [columns, setColumns] = useState(movieColumns);
   const page = useRecoilValue(filteredPaginationState("Search"));
   const keyword = useRecoilValue(searchKeywordState);
   const selectedValue = useRecoilValue(selectedValueState);
-  const selectedMovie = useRecoilValue(selectedMovieState);
+  const media = useRecoilValue(selectedMediaState);
   const handleModalProps = useSetRecoilState(modalPropsState);
 
-  const { data, isFetching } = useSearchMovieData(keyword, page[0].page);
-
-  const { data: TVData, isFetching: TVIsFetching } = useSearchTVShowData(
+  const { data, isFetching } = useSearchData(
     keyword,
     page[0].page,
+    selectedValue,
   );
 
   const searchResult = useMemo(() => (data ? data.results : []), [data]);
-  const searchTVResult = useMemo(() => (TVData ? TVData.results : []), [data]);
 
   const calcPageRange = (totalPage: number) => {
     return Math.ceil(totalPage / 20) > 5 ? 5 : Math.ceil(totalPage / 20);
   };
 
   useEffect(() => {
-    if (selectedMovie.id === -1) {
+    if (media.id === -1) {
       return;
     }
 
@@ -104,37 +53,39 @@ const Search = () => {
       isOpen: true,
       modalType: "Search",
     });
-  }, [selectedMovie]);
-  console.log(TVData);
+  }, [media]);
+
+  useEffect(() => {
+    if (selectedValue === "movie") {
+      setColumns(movieColumns);
+    } else if (selectedValue === "person") {
+      setColumns(movieColumns);
+    } else if (selectedValue === "tv") {
+      setColumns(TVShowColumns);
+    }
+  }, [selectedValue]);
+
   return (
     <Container>
       <SearchBar />
-
-      {searchResult.length && data && TVData ? (
-        <>
-          <MovieTable
-            columns={columns}
-            movies={selectedValue === "movie" ? searchResult : searchTVResult}
-          />
-          <Paging
-            pageName="Search"
-            itemsCountPerPage={20}
-            totalItemsCount={
-              selectedValue === "movie"
-                ? data.total_results
-                : TVData.total_results
-            }
-            pageRangeDisplayed={
-              selectedValue === "movie"
-                ? calcPageRange(data.total_results)
-                : calcPageRange(TVData.total_results)
-            }
-          />
-        </>
+      {data ? (
+        selectedValue === "person" ? (
+          <PersonLayout peopleData={searchResult} />
+        ) : (
+          <>
+            <Table columns={columns} datas={searchResult} />
+            <Paging
+              pageName="Search"
+              itemsCountPerPage={20}
+              totalItemsCount={data.total_results}
+              pageRangeDisplayed={calcPageRange(data.total_results)}
+            />
+          </>
+        )
       ) : (
         <div className="no-content">{"검색 결과가 없습니다"}</div>
       )}
-      <MovieModal />
+      <Modal />
     </Container>
   );
 };

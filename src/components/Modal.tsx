@@ -1,11 +1,10 @@
-import { BugReportTwoTone } from "@mui/icons-material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
 import { useRecoilState, useRecoilValue } from "recoil";
 
-import { modalPropsState, selectedMovieState } from "../recoils/movie/atom";
+import { modalPropsState, selectedMediaState } from "../recoils/movie/atom";
 
 const style = {
   position: "absolute",
@@ -21,13 +20,13 @@ const style = {
 
 const MovieModal = () => {
   const [modalProps, setModalProps] = useRecoilState(modalPropsState);
-  const movie = useRecoilValue(selectedMovieState);
+  const media = useRecoilValue(selectedMediaState);
 
   const handleClose = () => setModalProps({ ...modalProps, isOpen: false });
 
   return (
     <>
-      {movie ? (
+      {media ? (
         <div>
           <Modal
             open={modalProps.isOpen}
@@ -37,10 +36,10 @@ const MovieModal = () => {
           >
             <Box sx={style}>
               <Typography id="modal-modal-title" variant="h6" component="h2">
-                {movie.title}
+                {media.title ? media.title : media.name}
               </Typography>
               <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                {movie.overview}
+                {media.overview}
               </Typography>
               {modalProps.modalType === "List" ? (
                 <>

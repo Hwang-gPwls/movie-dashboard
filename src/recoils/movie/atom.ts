@@ -1,6 +1,6 @@
 import { atom, selector, selectorFamily } from "recoil";
 
-import { IMovie } from "../../api/movie";
+import { IMovie, ITVShow } from "../../api/movie";
 
 export interface IPaginationProps {
   pageName: "List" | "Search";
@@ -39,8 +39,8 @@ export const modalPropsState = atom<IModalProps>({
   },
 });
 
-export const selectedMovieState = atom<IMovie>({
-  key: "selectedMovieState",
+export const selectedMediaState = atom<IMovie | ITVShow>({
+  key: "selectedMediaState",
   default: {
     id: -1,
     backdrop_path: "",
@@ -59,5 +59,5 @@ export const searchKeywordState = atom<string>({
 
 export const selectedValueState = atom<string>({
   key: "selectedValueState",
-  default: "",
+  default: "movie",
 });
