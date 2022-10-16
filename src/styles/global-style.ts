@@ -3,14 +3,14 @@ import { reset } from "styled-reset";
 
 const GlobalStyle = createGlobalStyle`
     ${reset}
-    :focus {
-        outline: none;
-        border: none;
-    }
     html{
         font-family: "Noto-Sans", sans-serif;
         scroll-behavior: smooth;
-        background-color: #F5EFE6;
+        background-color: #fff;
+    }
+    body{
+        margin:0;
+        padding:0;
     }
     .fixed{
         width: 100%;
