@@ -1,4 +1,5 @@
 import { lazy } from "react";
+import { Navigate } from "react-router";
 
 import DefaultLayout from "../layouts/index";
 
@@ -8,17 +9,25 @@ const Add = lazy(() => import("../pages/Movie/Item/Add"));
 const Update = lazy(() => import("../pages/Movie/Item/Update"));
 const Search = lazy(() => import("../pages/Search"));
 
-const routes = [
+const routes = (isLogin: boolean) => [
   {
+    path: "/",
+    element: isLogin ? <Navigate to="/movie/list" /> : <Navigate to="/login" />,
+  },
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/search",
+    element: <DefaultLayout />,
+    children: [{ element: <Search />, path: "/search" }],
+  },
+  {
+    path: "/movie",
+    element: <DefaultLayout />,
     children: [
-      {
-        element: <Login />,
-        path: "/login",
-      },
-      {
-        element: <List />,
-        path: "/movie/list",
-      },
+      { element: <List />, path: "/movie/list" },
       {
         element: <Add />,
         path: "/movie/item/add",
@@ -27,13 +36,7 @@ const routes = [
         element: <Update />,
         path: "/movie/item/update",
       },
-      {
-        element: <Search />,
-        path: "/search",
-      },
     ],
-    element: <DefaultLayout />,
-    path: "/",
   },
 ];
 

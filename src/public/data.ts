@@ -1,4 +1,4 @@
-import { Column } from "../components/Table";
+import { Column } from "../components/TableControl";
 
 export const menuItems = [
   {

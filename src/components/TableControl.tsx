@@ -30,6 +30,16 @@ const BodyRow = styled(TableRow)`
   cursor: pointer;
 `;
 
+const Container = styled.div`
+  width: 100%;
+  height: 100%;
+`;
+
+const TableContainerWrapper = styled(TableContainer)`
+  width: 100%;
+  height: 100%;
+`;
+
 interface ITableControlProps {
   columns: Column[];
   datas: IMovie[] | ITVShow[];
@@ -56,8 +66,8 @@ const TableControl = ({ columns, datas }: ITableControlProps) => {
   };
 
   return (
-    <>
-      <TableContainer sx={{ maxHeight: 440 }}>
+    <Container>
+      <TableContainerWrapper>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
@@ -113,8 +123,8 @@ const TableControl = ({ columns, datas }: ITableControlProps) => {
             })}
           </TableBody>
         </Table>
-      </TableContainer>
-    </>
+      </TableContainerWrapper>
+    </Container>
   );
 };
 

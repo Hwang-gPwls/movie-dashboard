@@ -1,6 +1,5 @@
 import { Outlet } from "react-router";
 
-import Header from "./Header";
 import Menu from "./SideMenu";
 
 interface LayoutDefaultProps {
@@ -11,7 +10,6 @@ const DefaultLayout = ({ children }: LayoutDefaultProps) => {
   return (
     <div>
       <Menu />
-      {/* <Header /> */}
       <main>{children || <Outlet />}</main>
     </div>
   );

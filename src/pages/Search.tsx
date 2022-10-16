@@ -1,13 +1,12 @@
-import Paper from "@mui/material/Paper";
 import { useEffect, useMemo, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
 
-import Modal from "../components/Modal";
+import ModalControl from "../components/ModalControl";
 import Paging from "../components/Paging";
 import PersonLayout from "../components/Person/PersonLatout";
 import SearchBar from "../components/SearchBar";
-import Table from "../components/Table";
+import TableControl from "../components/TableControl";
 import { useSearchData } from "../hooks/queries/movie";
 import { TVShowColumns, movieColumns } from "../public/data";
 import {
@@ -18,10 +17,29 @@ import {
   selectedValueState,
 } from "../recoils/movie/atom";
 
-const Container = styled(Paper)`
-  width: 90vw;
+const Container = styled.div`
+  width: calc(100% - 200px);
+  margin-left: 200px;
   overflow: hidden;
-  margin-left: 135px;
+  border: none;
+`;
+
+const ContentContainer = styled.div`
+  border-top: solid 0.5px;
+  text-align: center;
+  height: calc(100% - 5rem);
+  margin-top: 5rem;
+
+  .no-content {
+    margin: 42vh 0 0 0;
+    font-size: 30px;
+    text-align: center;
+  }
+`;
+
+const TableBox = styled.div`
+  height: 87vh;
+  border-bottom: solid 0.1px;
 `;
 
 const Search = () => {
@@ -58,8 +76,6 @@ const Search = () => {
   useEffect(() => {
     if (selectedValue === "movie") {
       setColumns(movieColumns);
-    } else if (selectedValue === "person") {
-      setColumns(movieColumns);
     } else if (selectedValue === "tv") {
       setColumns(TVShowColumns);
     }
@@ -68,24 +84,29 @@ const Search = () => {
   return (
     <Container>
       <SearchBar />
-      {data ? (
-        selectedValue === "person" ? (
-          <PersonLayout peopleData={searchResult} />
+      <ContentContainer>
+        {data && searchResult.length ? (
+          selectedValue === "person" ? (
+            <PersonLayout peopleData={searchResult} />
+          ) : (
+            <>
+              <TableBox>
+                <TableControl columns={columns} datas={searchResult} />
+              </TableBox>
+
+              <Paging
+                pageName="Search"
+                itemsCountPerPage={20}
+                totalItemsCount={data.total_results}
+                pageRangeDisplayed={calcPageRange(data.total_results)}
+              />
+            </>
+          )
         ) : (
-          <>
-            <Table columns={columns} datas={searchResult} />
-            <Paging
-              pageName="Search"
-              itemsCountPerPage={20}
-              totalItemsCount={data.total_results}
-              pageRangeDisplayed={calcPageRange(data.total_results)}
-            />
-          </>
-        )
-      ) : (
-        <div className="no-content">{"검색 결과가 없습니다"}</div>
-      )}
-      <Modal />
+          <div className="no-content">{"검색 결과가 없습니다"}</div>
+        )}
+      </ContentContainer>
+      <ModalControl />
     </Container>
   );
 };

@@ -1,4 +1,4 @@
-import { atom, selector, selectorFamily } from "recoil";
+import { atom, selectorFamily } from "recoil";
 
 import { IMovie, ITVShow } from "../../api/movie";
 
@@ -60,4 +60,9 @@ export const searchKeywordState = atom<string>({
 export const selectedValueState = atom<string>({
   key: "selectedValueState",
   default: "movie",
+});
+
+export const listIdState = atom<number>({
+  key: "listIdState",
+  default: 1,
 });

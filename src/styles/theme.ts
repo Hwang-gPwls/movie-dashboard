@@ -6,6 +6,9 @@ export const theme = {
     lightblue: "#AEBDCA",
     beige: "#E8DFCA",
     lightbeige: "#F5EFE6",
+    brown: "#454545",
+    error: "#bf1650",
+    gray: "#C5C6D0",
   },
 };
 

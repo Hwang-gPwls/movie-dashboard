@@ -1,16 +1,19 @@
+import { Button } from "@mui/material";
+import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
 import Paper from "@mui/material/Paper";
 import React, { useEffect, useMemo } from "react";
-import { useQuery } from "react-query";
+import { useNavigate } from "react-router";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
 
-import { PaginationResponse, fetchMovies } from "../../api/movie";
-import MovieModal from "../../components/Modal";
+import ModalControl from "../../components/ModalControl";
 import Paging from "../../components/Paging";
-import MovieTable, { Column } from "../../components/Table";
+import TableControl, { Column } from "../../components/TableControl";
 import { useListMovieData } from "../../hooks/queries/movie";
 import {
   filteredPaginationState,
+  listIdState,
   modalPropsState,
   selectedMediaState,
 } from "../../recoils/movie/atom";
@@ -61,19 +64,45 @@ const columns: Column[] = [
 ];
 
 const Container = styled(Paper)`
-  width: 90vw;
+  width: calc(100% - 200px);
+  height: 100vh;
   overflow: hidden;
-  margin-left: 135px;
+  margin-left: 200px;
+`;
+
+const Header = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2rem 5rem;
+  border-bottom: solid 1px;
+`;
+
+const TableBox = styled.div`
+  height: 88vh;
+  border-bottom: solid 0.1px;
+`;
+
+const Title = styled.h1`
+  font-weight: 600;
 `;
 
 const List = () => {
-  const page = useRecoilValue(filteredPaginationState("List"));
+  const navigation = useNavigate();
+
+  const listId = useRecoilValue(listIdState);
   const media = useRecoilValue(selectedMediaState);
+  const page = useRecoilValue(filteredPaginationState("List"));
   const handleModalProps = useSetRecoilState(modalPropsState);
 
-  const { data, isFetching } = useListMovieData(page[0].page);
+  const { data, isLoading, refetch } = useListMovieData(page[0].page, listId);
 
   const movies = useMemo(() => (data ? data.results : []), [data]);
+
+  const handleRefetch = () => {
+    refetch();
+  };
 
   const calcPageRange = (totalPage: number) => {
     return Math.ceil(totalPage / 20) > 5 ? 5 : Math.ceil(totalPage / 20);
@@ -90,16 +119,40 @@ const List = () => {
     });
   }, [media]);
 
+  useEffect(() => {
+    handleRefetch();
+  }, [listId]);
+
   return (
     <Container>
-      <MovieTable columns={columns} datas={movies} />
-      <Paging
-        pageName={"List"}
-        itemsCountPerPage={20}
-        totalItemsCount={data ? data.total_results : 0}
-        pageRangeDisplayed={data ? calcPageRange(data.total_results) : 0}
-      />
-      <MovieModal />
+      {isLoading ? (
+        <Box sx={{ display: "flex" }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <>
+          <Header>
+            <Title>{"Movie 조회 목록"}</Title>
+            <Button
+              onClick={() => {
+                navigation("/movie/item/add");
+              }}
+            >
+              추가
+            </Button>
+          </Header>
+          <TableBox>
+            <TableControl columns={columns} datas={movies} />
+            <Paging
+              pageName={"List"}
+              itemsCountPerPage={20}
+              totalItemsCount={data ? data.total_results : 0}
+              pageRangeDisplayed={data ? calcPageRange(data.total_results) : 0}
+            />
+            <ModalControl handleRefetch={handleRefetch} />
+          </TableBox>
+        </>
+      )}
     </Container>
   );
 };

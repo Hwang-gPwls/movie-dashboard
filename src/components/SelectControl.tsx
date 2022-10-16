@@ -4,9 +4,14 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { useRecoilState } from "recoil";
+import styled from "styled-components";
 
 import { selectItems } from "../public/data";
 import { selectedValueState } from "../recoils/movie/atom";
+
+const SelectBox = styled(Box)`
+  z-index: 999;
+`;
 
 const SelectControl = () => {
   const [selectedValue, setSelectedValue] = useRecoilState(selectedValueState);
@@ -16,7 +21,7 @@ const SelectControl = () => {
   };
 
   return (
-    <Box sx={{ minWidth: 120 }}>
+    <SelectBox sx={{ minWidth: 120 }}>
       <FormControl fullWidth>
         <InputLabel id="demo-simple-select-label">Select</InputLabel>
         <Select
@@ -33,7 +38,7 @@ const SelectControl = () => {
           ))}
         </Select>
       </FormControl>
-    </Box>
+    </SelectBox>
   );
 };
 

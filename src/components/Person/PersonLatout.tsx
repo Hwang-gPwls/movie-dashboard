@@ -4,8 +4,7 @@ import styled from "styled-components";
 import { IMovie, IPerson, ITVShow } from "../../api/movie";
 import { TVShowColumns, movieColumns } from "../../public/data";
 import CardControl from "../CardControl";
-import Paging from "../Paging";
-import Table from "../Table";
+import TableControl from "../TableControl";
 
 const Container = styled.div``;
 
@@ -13,13 +12,23 @@ const PersonBox = styled.div`
   display: flex;
   padding: 20px;
   overflow: auto;
-  border: 1px solid #000;
   white-space: nowrap;
+`;
+
+const TableBox = styled.div`
+  height: 30vh;
+  margin-top: 3.4rem;
+  border-top: solid 0.5px;
+  padding: 10px 0;
 `;
 
 const PersonCard = styled.div`
   cursor: pointer;
   margin-left: 10px;
+`;
+
+const Title = styled.h1`
+  font-weight: 600;
 `;
 
 interface IPersonLayoutProps {
@@ -76,10 +85,15 @@ const PersonLayout = ({ peopleData }: IPersonLayoutProps) => {
               </PersonCard>
             ))}
           </PersonBox>
-          {"Movie"}
-          <Table columns={movieColumns} datas={movieData} />
-          {"TV"}
-          <Table columns={TVShowColumns} datas={tvShowData} />
+          <TableBox>
+            <Title>{"Movie"}</Title>
+            <TableControl columns={movieColumns} datas={movieData} />
+          </TableBox>
+
+          <TableBox>
+            <Title>{"TV"}</Title>
+            <TableControl columns={TVShowColumns} datas={tvShowData} />
+          </TableBox>
         </>
       ) : null}
     </Container>
@@ -87,6 +101,3 @@ const PersonLayout = ({ peopleData }: IPersonLayoutProps) => {
 };
 
 export default PersonLayout;
-function useSelector(): [any, any] {
-  throw new Error("Function not implemented.");
-}

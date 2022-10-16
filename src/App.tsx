@@ -9,7 +9,8 @@ import GlobalStyle from "./styles/global-style";
 import { theme } from "./styles/theme";
 
 const Routes = () => {
-  return useRoutes(routes);
+  const isLogin = document.cookie ? true : false;
+  return useRoutes(routes(isLogin));
 };
 
 const queryClient = new QueryClient();
